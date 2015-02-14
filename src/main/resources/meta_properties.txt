@@ -1,0 +1,12 @@
+http://www.w3.org/2002/07/owl#sameAs
+http://open.vocab.org/terms/defines
+http://open.vocab.org/terms/describes
+http://www.w3.org/2000/01/rdf-schema#comment
+http://www.w3.org/2000/01/rdf-schema#isDefinedBy
+http://dbpedia.org/ontology/abstract
+http://www.w3.org/2000/01/rdf-schema#domain
+http://xmlns.com/foaf/0.1/primaryTopic
+http://xmlns.com/foaf/0.1/isPrimaryTopicOf
+http://dbpedia.org/ontology/wikiPageDisambiguates
+http://dbpedia.org/ontology/wikiPageRedirects
+http://dbpedia.org/ontology/wikiPageExternalLink
