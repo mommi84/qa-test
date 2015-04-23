@@ -15,7 +15,7 @@ import com.hp.hpl.jena.rdf.model.Statement;
 import com.hp.hpl.jena.rdf.model.StmtIterator;
 
 /**
- * @author Tommaso Soru <t.soru@informatik.uni-leipzig.de>
+ * @author Tommaso Soru <tsoru@informatik.uni-leipzig.de>
  *
  */
 public class DatasetBuilder implements Runnable {
@@ -63,6 +63,8 @@ public class DatasetBuilder implements Runnable {
 			
 			if(Settings.META_PROPERTIES.contains(p.getURI()))
 				continue;
+			
+			// TODO if (p=type and o=rdf:Property) ...
 			
 			saveLabel(s, p, o);
 			

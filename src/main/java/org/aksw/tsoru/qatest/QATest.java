@@ -6,7 +6,7 @@ import java.util.TreeSet;
 /**
  * This is just to test a micro-model based on few data.
  *  
- * @author Tommaso Soru <t.soru@informatik.uni-leipzig.de>
+ * @author Tommaso Soru <tsoru@informatik.uni-leipzig.de>
  *
  */
 public class QATest {
