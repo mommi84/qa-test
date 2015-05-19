@@ -39,8 +39,8 @@ public class TheIndex {
 	private IndexSearcher isearcher;
 	private QueryParser parser;
 	
-	private static final String STORED_FIELD = "name";
-	private static final String[] NOT_STORED_FIELDS = {"tags"};
+	private static final String STORED_FIELD = "label";
+	private static final String[] NOT_STORED_FIELDS = {"uri"};
 	
 	private static final double SCORE_THRESHOLD = 0.6;
 	private static final int TOP_DOCS = 1;
@@ -168,14 +168,14 @@ public class TheIndex {
 //	    
 //	}
 	
-	public void init(HashMap<String, String> map) throws IOException {
+	public void write(HashMap<String, String> map) throws IOException {
 	    IndexWriterConfig config = new IndexWriterConfig(version, analyzer);
 	    IndexWriter iwriter = new IndexWriter(directory, config);
 	    
 	    for(String key : map.keySet()) {
 	    	Document doc = new Document();
 	    	doc.add(new Field(STORED_FIELD, key, TextField.TYPE_STORED));
-	    	doc.add(new Field(NOT_STORED_FIELDS[0], map.get(key), TextField.TYPE_STORED));
+	    	doc.add(new Field(NOT_STORED_FIELDS[0], map.get(key), TextField.TYPE_NOT_STORED));
 	    	iwriter.addDocument(doc);
 	    }
 	    

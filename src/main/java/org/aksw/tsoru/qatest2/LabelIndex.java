@@ -1,8 +1,10 @@
 package org.aksw.tsoru.qatest2;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 
+import org.apache.lucene.document.Document;
 import org.apache.lucene.queryparser.classic.ParseException;
 
 import com.hp.hpl.jena.graph.Triple;
@@ -31,7 +33,15 @@ public class LabelIndex {
 	
 	public static void index() {
 		try {
-			index.init(map);
+			index.write(map);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
+	public static void initSearch() {
+		try {
 			index.initSearch();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
@@ -39,9 +49,12 @@ public class LabelIndex {
 		}
 	}
 	
-	public static int search(String q) {
+	public static Document search(String q) {
 		try {
-			return index.search(q).size();
+			ArrayList<Document> arr = index.search(q);
+			if(arr.isEmpty())
+				return null;
+			return arr.get(0);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -49,7 +62,7 @@ public class LabelIndex {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		return -1;
+		return null;
 	}
 
 }

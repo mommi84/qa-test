@@ -9,15 +9,21 @@ import org.json.simple.parser.ParseException;
  */
 public class QATest2 {
 	
-	private static final String QUERY = "Barack Obama birth place";
+	private static final String QUERY = "Barack Obama birth place.";
 	
 	private static final Logger LOGGER = Logger.getLogger(QATest2.class);
+	
+	private static final boolean ENABLE_INDEXING = false;
 
 	public static void main(String[] args) throws ParseException {
 		
-		Corpus.extractLabels();
+		if(ENABLE_INDEXING) {
+			Corpus.extractOntologyLabels();
+			Corpus.extractLabels();
+			LabelIndex.index();
+		}
 		
-		LabelIndex.index();
+		LabelIndex.initSearch();
 		
 		LOGGER.info("Query: '"+QUERY+"'");
 		
@@ -25,6 +31,8 @@ public class QATest2 {
 		
 		String p = res.get();
 		LOGGER.info(p + " => " + LabelIndex.search(p));
+		
+		LOGGER.info("birth place => " + LabelIndex.search("birth place"));
 	}
 
 }
