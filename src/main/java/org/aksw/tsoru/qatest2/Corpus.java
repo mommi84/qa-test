@@ -13,7 +13,7 @@ import com.hp.hpl.jena.sparql.core.Quad;
  */
 public class Corpus {
 	
-	private static final String DATASET = "../../keydiscovery/rocker/data/persondata_en.nt";
+	private static final String DATASET = "data/persondata_en.nt";
 	private static final String ONTOLOGY = "data/dbpedia_2014.owl";
 	
 	private static final Logger LOGGER = Logger.getLogger(Corpus.class);

@@ -9,7 +9,7 @@ import org.json.simple.parser.ParseException;
  */
 public class QATest2 {
 	
-	private static final String QUERY = "Barack Obama birth place.";
+	public static final String QUERY = "Barack Obama birth place";
 	
 	private static final Logger LOGGER = Logger.getLogger(QATest2.class);
 	
