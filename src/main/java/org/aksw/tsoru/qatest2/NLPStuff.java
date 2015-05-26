@@ -9,6 +9,8 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
+import edu.stanford.nlp.trees.Tree;
+
 /**
  * @author Tommaso Soru <tsoru@informatik.uni-leipzig.de>
  *
@@ -16,9 +18,48 @@ import org.json.simple.parser.ParseException;
 public class NLPStuff {
 
 	private static final Logger LOGGER = Logger.getLogger(NLPStuff.class);
-
+	
 	public static Something subjects(final String QUERY) throws ParseException {
-		String jsonString = StanfordNLP.parse(QUERY);
+		Something res = new Something();
+		res.addCompound("nothing");
+		
+		Tree tree = StanfordNLP.getBestParse(QUERY);
+		
+		HashMap<String, ArrayList<String>> sparseMatrix = toSparseMatrix(tree);
+		System.out.println(sparseMatrix);
+//		System.out.println(tree.constituents());
+		return res;
+	}
+
+	private static HashMap<String, ArrayList<String>> toSparseMatrix(Tree tree) {
+		HashMap<String, ArrayList<String>> matrix = new HashMap<String, ArrayList<String>>();
+		
+		recursiveVisit(tree, matrix);
+		
+		return matrix;
+	}
+
+	private static void recursiveVisit(Tree tree, HashMap<String, ArrayList<String>> matrix) {
+		String treeName = tree.value();
+//		System.out.println(treeName+" | "+tree.isLeaf());
+		for(Tree subtree : tree.children()) {
+			if(!subtree.isLeaf()) {
+				ArrayList<String> arr;
+				if(matrix.containsKey(treeName))
+					arr = matrix.get(treeName);
+				else {
+					arr = new ArrayList<String>();
+					matrix.put(treeName, arr);
+				}
+				arr.add(subtree.value());
+				recursiveVisit(subtree, matrix);
+			}
+		}
+	}
+
+	public static Something subjectsJSON(final String QUERY) throws ParseException {
+		
+		String jsonString = StanfordNLP.parseToJSON(QUERY);
 		JSONParser jsonP = new JSONParser();
 		JSONObject root = (JSONObject) jsonP.parse(jsonString);
 
