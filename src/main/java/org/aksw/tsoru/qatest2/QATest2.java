@@ -43,10 +43,8 @@ public class QATest2 {
 			
 			Something res = NLPStuff.subjects(q);
 			
-			String p = res.get();
-			LOGGER.info(p + " => " + LabelIndex.search(p));
+			LOGGER.info(res + " => " + LabelIndex.search(res.toString()));
 			
-			LOGGER.info("birth place => " + LabelIndex.search("birth place"));
 		}
 	}
 

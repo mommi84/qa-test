@@ -19,16 +19,12 @@ public class Something {
 	}
 	
 	public String toString() {
-		return compounds.toString();
-	}
-	
-	public String get() {
 		String str = "";
 		if(compounds.isEmpty())
 			return str;
 		for(String s : compounds)
 			str += s + " ";
-		return str.substring(0, str.length()-1);
+		return str.trim();
 	}
 
 }

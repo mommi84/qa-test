@@ -2,7 +2,9 @@ package org.aksw.tsoru.qatest2;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.TreeSet;
 
+import org.aksw.tsoru.qatest2.model.NLPNode;
 import org.apache.log4j.Logger;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -19,18 +21,43 @@ public class NLPStuff {
 
 	private static final Logger LOGGER = Logger.getLogger(NLPStuff.class);
 	
-	public static Something subjects(final String QUERY) throws ParseException {
+	public static Something subjects(String query) throws ParseException {
 		Something res = new Something();
 		res.addCompound("nothing");
 		
-		Tree tree = StanfordNLP.getBestParse(QUERY);
+		Tree tree = StanfordNLP.getBestParse(query);
 		
 		HashMap<String, ArrayList<String>> sparseMatrix = toSparseMatrix(tree);
 		System.out.println(sparseMatrix);
+		
+		TreeSet<NLPNode> nodes = new TreeSet<>();
+		toNodes(null, tree, nodes);
+		System.out.println(nodes);
+		
+		
 //		System.out.println(tree.constituents());
 		return res;
 	}
 
+	private static void toNodes(NLPNode parent, Tree tree, TreeSet<NLPNode> nodes) {
+		
+		String treeName = tree.value();
+		
+		NLPNode node = new NLPNode(parent, treeName);
+		for(NLPNode n : nodes)
+			if(n.getName().equals(treeName))
+				node.incr();
+		nodes.add(node);
+		
+		for(Tree subtree : tree.children()) {
+			if(!subtree.isLeaf())
+				toNodes(node, subtree, nodes);
+			else
+				node.setValue(subtree.value());
+		}
+	}
+
+	@SuppressWarnings("unused")
 	private static HashMap<String, ArrayList<String>> toSparseMatrix(Tree tree) {
 		HashMap<String, ArrayList<String>> matrix = new HashMap<String, ArrayList<String>>();
 		
