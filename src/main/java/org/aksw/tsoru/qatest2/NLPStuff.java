@@ -57,7 +57,6 @@ public class NLPStuff {
 		}
 	}
 
-	@SuppressWarnings("unused")
 	private static HashMap<String, ArrayList<String>> toSparseMatrix(Tree tree) {
 		HashMap<String, ArrayList<String>> matrix = new HashMap<String, ArrayList<String>>();
 		
@@ -84,9 +83,9 @@ public class NLPStuff {
 		}
 	}
 
-	public static Something subjectsJSON(final String QUERY) throws ParseException {
+	public static Something subjectsJSON(String query) throws ParseException {
 		
-		String jsonString = StanfordNLP.parseToJSON(QUERY);
+		String jsonString = StanfordNLP.parseToJSON(query);
 		JSONParser jsonP = new JSONParser();
 		JSONObject root = (JSONObject) jsonP.parse(jsonString);
 
