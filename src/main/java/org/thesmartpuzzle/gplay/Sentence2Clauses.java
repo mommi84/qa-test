@@ -10,9 +10,9 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Scanner;
+import java.util.stream.IntStream;
 
 import org.aksw.tsoru.qatest2.StanfordNLP;
-import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.ArrayUtils;
 
 import edu.stanford.nlp.ling.HasWord;
@@ -30,7 +30,7 @@ public class Sentence2Clauses {
 
 	public static void main(String[] args) throws FileNotFoundException {
 		
-		long start = System.currentTimeMillis();
+		String prefix = args[1];
 		
 		HashSet<String> reviews = new HashSet<>();
 		
@@ -41,7 +41,30 @@ public class Sentence2Clauses {
 		}
 		in.close();
 		
+		final int N = Runtime.getRuntime().availableProcessors();
+		final PrintWriter pw[] = new PrintWriter[N];
+		
+		IntStream.range(0, N).parallel().forEach(i -> {
+			String name = Thread.currentThread().getName();
+			if(name.equals("main"))
+				name = "0";
+			else
+				name = name.substring(name.length() - 1);
+			String filename = prefix + "." + name;
+			System.out.println("Opening " + filename);
+			
+			try {
+				pw[i] = new PrintWriter(new File(filename));
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			
+		});
+		
+		long start = System.currentTimeMillis();
+		
 		reviews.parallelStream().forEach(input -> {
+			
 			String out = input + "\n";
 //			long st = System.currentTimeMillis();
 			HashSet<String> clauses = run(input);
@@ -51,10 +74,32 @@ public class Sentence2Clauses {
 				out += clause + "\n";
 			}
 //			System.out.println("\n" + Thread.currentThread().getName());
-			System.out.println(out.trim());
+			String name = Thread.currentThread().getName();
+			int n = name.equals("main") ? 0 : Integer.parseInt(name.substring(name.length() - 1));
+			
+			pw[n].println(out.trim());
+			
 		});
 		
 		System.out.println("Done in "+(System.currentTimeMillis()-start)+" ms.");
+		
+		IntStream.range(0, N).parallel().forEach(i -> {
+			String name = Thread.currentThread().getName();
+			if(name.equals("main"))
+				name = "0";
+			else
+				name = name.substring(name.length() - 1);
+			String filename = prefix + "." + name;
+			System.out.println("Closing " + filename);
+			
+			try {
+				pw[i].close();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			
+		});
+
 
 	}
 	
