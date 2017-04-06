@@ -49,7 +49,7 @@ public class Sentence2Clauses {
 			if(name.equals("main"))
 				name = "0";
 			else
-				name = name.substring(name.length() - 1);
+				name = name.substring(name.lastIndexOf('-') + 1);
 			String filename = prefix + "." + name;
 			System.out.println("Opening " + filename);
 			
@@ -88,7 +88,7 @@ public class Sentence2Clauses {
 			if(name.equals("main"))
 				name = "0";
 			else
-				name = name.substring(name.length() - 1);
+				name = name.substring(name.lastIndexOf('-') + 1);
 			String filename = prefix + "." + name;
 			System.out.println("Closing " + filename);
 			
