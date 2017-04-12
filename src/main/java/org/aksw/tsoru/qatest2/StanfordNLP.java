@@ -27,7 +27,7 @@ public class StanfordNLP {
 	private static LexicalizedParser parser = LexicalizedParser
 			.loadModel("edu/stanford/nlp/models/lexparser/englishPCFG.ser.gz");
 	// private TreeUtil treeUtil;
-	private static TokenizerFactory<Word> tokenizerFactory = PTBTokenizer.factory();
+//	private static TokenizerFactory<Word> tokenizerFactory = PTBTokenizer.factory();
 	
 	public static void main(String[] args) {
 		String query = QATest2.QUERY[0];
@@ -61,9 +61,10 @@ public class StanfordNLP {
 
 	public static Tree getBestParse(String sentence) {
 //		List<Word> tokens = tokenize(sentence);
-		List<Word> tokens = tokenizerFactory.getTokenizer(new StringReader(sentence)).tokenize();
+//		List<Word> tokens = tokenizerFactory.getTokenizer(new StringReader(sentence)).tokenize();
 //		LexicalizedParser parser = getParser();
-		Tree tree = parser.parse(tokens);
+//		Tree tree = parser.parse(tokens);
+		Tree tree = parser.parse(sentence);
 //		System.out.println(tree.pennString());
 		return tree;
 		// Tree stringLabeledTree = getTreeUtil().treeToStringLabeledTree(tree);

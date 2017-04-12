@@ -2,7 +2,6 @@ package org.thesmartpuzzle.gplay;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.PrintWriter;
 import java.io.Reader;
 import java.io.StringReader;
 import java.util.ArrayList;
@@ -10,10 +9,12 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Scanner;
-import java.util.stream.IntStream;
+
 
 import org.aksw.tsoru.qatest2.StanfordNLP;
 import org.apache.commons.lang3.ArrayUtils;
+import org.apache.log4j.Logger;
+
 
 import edu.stanford.nlp.ling.HasWord;
 import edu.stanford.nlp.ling.Word;
@@ -26,14 +27,20 @@ import edu.stanford.nlp.trees.Tree;
  */
 public class Sentence2Clauses {
 	
+	private static final Logger logger = Logger.getLogger(Sentence2Clauses.class);
+	
 	private static final String[] TARGETS = {"ROOT", "SBAR"}; 
 
+	
 	public static void main(String[] args) throws FileNotFoundException {
 		
 		String prefix = args[1];
 		
+		final Integer EVERY = Integer.parseInt(args[2]);
+		
 		HashSet<String> reviews = new HashSet<>();
 		
+		logger.info("Loading input file in-memory...");
 		Scanner in = new Scanner(new File(args[0]));
 		while(in.hasNextLine()) {
 			String input = in.nextLine();
@@ -41,65 +48,47 @@ public class Sentence2Clauses {
 		}
 		in.close();
 		
-		final int N = Runtime.getRuntime().availableProcessors();
-		final PrintWriter pw[] = new PrintWriter[N];
-		
-		IntStream.range(0, N).parallel().forEach(i -> {
-			String name = Thread.currentThread().getName();
-			if(name.equals("main"))
-				name = "0";
-			else
-				name = name.substring(name.lastIndexOf('-') + 1);
-			String filename = prefix + "." + name;
-			System.out.println("Opening " + filename);
-			
-			try {
-				pw[i] = new PrintWriter(new File(filename));
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-			
-		});
-		
+		final Integer SIZE = reviews.size();
+
 		long start = System.currentTimeMillis();
 		
+		logger.info("Opening file "+prefix+"...");
+		SyncWriter writer = SyncWriter.getInstance();
+		writer.open(new File(prefix));
+		
+		Bean b = new Bean();
+		
+		logger.info("Started NLP processing...");
 		reviews.parallelStream().forEach(input -> {
 			
-			String out = input + "\n";
-//			long st = System.currentTimeMillis();
-			HashSet<String> clauses = run(input);
-//			System.out.println("review: "+(System.currentTimeMillis()-st));
-			out += clauses.size() + "\n";
-			for(String clause : clauses) {
-				out += clause + "\n";
-			}
-//			System.out.println("\n" + Thread.currentThread().getName());
-			String name = Thread.currentThread().getName();
-			int n = name.equals("main") ? 0 : Integer.parseInt(name.substring(name.length() - 1));
-			
-			pw[n].println(out.trim());
-			
-		});
-		
-		System.out.println("Done in "+(System.currentTimeMillis()-start)+" ms.");
-		
-		IntStream.range(0, N).parallel().forEach(i -> {
-			String name = Thread.currentThread().getName();
-			if(name.equals("main"))
-				name = "0";
-			else
-				name = name.substring(name.lastIndexOf('-') + 1);
-			String filename = prefix + "." + name;
-			System.out.println("Closing " + filename);
-			
-			try {
-				pw[i].close();
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-			
-		});
+			StringBuffer out = new StringBuffer(input + "\n");
 
+			HashSet<String> clauses = run(input);
+
+			out.append(clauses.size() + "\n");
+			for(String clause : clauses) {
+				out.append(clause + "\n");
+			}
+
+			try {
+				synchronized (writer) {					
+					writer.println(out.toString().trim());
+				}
+			} catch (Exception e) {
+				logger.error(e.getMessage());
+			}
+			
+			synchronized (b) {
+				b.count ++;
+				if(b.count % EVERY == 0)
+					logger.info(b.count + "/" + SIZE + " rows processed.");
+			}
+			
+		});
+		
+		writer.close();
+		
+		logger.info("Done in "+(System.currentTimeMillis()-start)+" ms.");
 
 	}
 	
@@ -173,6 +162,8 @@ public class Sentence2Clauses {
 		if(str.isEmpty())
 			return str;
 		
+		str = str.trim();
+		
 		if(str.startsWith(".") || str.startsWith(","))
 			return clean(str.substring(1).trim());
 		
@@ -195,9 +186,6 @@ public class Sentence2Clauses {
 		   sentenceList.add(sentenceString.trim());
 		}
 
-		//System.out.println("Sentences: ("+sentenceList.size()+")");
-//		for (String sentence : sentenceList)
-//		   System.out.println("- " + sentence);
 		return sentenceList;
 	}
 	
@@ -218,4 +206,8 @@ public class Sentence2Clauses {
 		return s.trim();
 	}
 
+}
+
+class Bean {
+	Integer count = 0;
 }
